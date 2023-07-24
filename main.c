@@ -5,6 +5,14 @@
 
 #define NEWLINE "\r\n"
 
+// TODO: Allocate this in dynamic memory
+#define MODULE_SECTIONS_MAX 32
+typedef struct
+{
+    char resource_type[MODULE_SECTIONS_MAX][32];
+    char path[MODULE_SECTIONS_MAX][256];
+} Module;
+
 typedef enum {false, true} bool;
 
 char* str_skip_line(char* buffer, char* cursor)
@@ -61,12 +69,20 @@ void str_tag_extract_attr(char* tag, const char* attr_name, char* out)
 }
 
 // TODO: Add a backups
-int main()
+// TODO: Add a success switch that is only true so long as all paths in the specified module were found
+int main(int argc, char** argv)
 {
-    char* project;
-
+    if (argc < 2)
     {
-        FILE* f = fopen("project.gmx", "rb");
+        printf("Gamemaker project not specified");
+        return 0;
+    }
+
+    const char* PROJECT_PATH = argv[1];
+
+    char* project;
+    {
+        FILE* f = fopen(PROJECT_PATH, "rb");
         if (!f)
         {
             return 1;
@@ -103,13 +119,6 @@ int main()
     }
 
     char* resource_type = "objects";
-
-    // Test string for later
-    //project =
-    //    "<!-- lol comment-->\r\n"
-    //    "<assets>\r\n"
-    //        "<object name=\"named\">hellllooooo</object>\r\n"
-    //    "</assets>\0";
     char* cursor = project;
     char* tag_begin_cursor;
     char* tag_content_cursor;
@@ -124,7 +133,7 @@ int main()
     char tag_name[128];
     char attr_name[128];
     unsigned depth = 0;
-    
+
     cursor = str_skip_line(project, cursor);
 
     while (cursor)
