@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #define NEWLINE "\r\n"
+#define MODULES_MAX 32
 
 // TODO: Allocate this in dynamic memory
 #define MODULE_SECTIONS_MAX 32
@@ -68,17 +69,112 @@ void str_tag_extract_attr(char* tag, const char* attr_name, char* out)
     str_copy_from_to_nullt(attr_cursor_begin, attr_cursor_end, out);
 }
 
-// TODO: Add a backups
+// TODO: Add backups
 // TODO: Add a success switch that is only true so long as all paths in the specified module were found
+// TODO: Make a system for collecting errors so that they can accumulate before terminating
 int main(int argc, char** argv)
 {
-    if (argc < 2)
+    if (argc == 1)
     {
-        printf("Gamemaker project not specified");
+        printf(
+            "################## GMCOLLAGE ##################\n"
+            "Usage: gmcollage <project.gmx> in/out <.module/.moduleconfig> <OPTIONAL SWITCHES>\n"
+            "Providing multiple module/moduleconfig paths can be done with comma separation\n"
+            "\n"
+            "Optional switches\n"
+            "-o <DIR> | Output directory\n"
+            "\n");
         return 0;
     }
 
+    if (argc < 2)
+    {
+        printf("ERROR: Gamemaker project not specified\n");
+        return 1;
+    }
+
     const char* PROJECT_PATH = argv[1];
+
+    if (argc < 3 || (strcmp(argv[2], "in") != 0 && strcmp(argv[2], "out")) != 0)
+    {
+        printf("ERROR: Specify whether importing or extracting module with in/out\n");
+        return 1;
+    }
+
+    const bool MODULE_IN = strcmp(argv[2], "in") == 0;
+
+    unsigned module_number = 0;
+    char* module_paths[MODULES_MAX];
+    char* output_path = "";
+    char current_switch = ' ';
+
+    for (int i = 3; i < argc; i++)
+    {
+        if (current_switch != ' ')
+        {
+            switch (current_switch)
+            {
+                case 'o': output_path = argv[i]; break;
+                // case 'r': break; TODO: Implement file replacement switch
+            }
+            current_switch = ' ';
+        }
+        else
+        {
+            if (argv[i][0] == '-')
+            {
+                switch (argv[i][1])
+                {
+                    case 'o':
+                    current_switch = argv[i][1];
+                    break;
+
+                    default:
+                    printf("Invalid switch \"");
+                    printf(argv[i]);
+                    printf("\"\n");
+                    break;
+                }
+            }
+            else
+            {
+                if (module_number >= MODULES_MAX)
+                {
+                    if (MODULE_IN)
+                        printf("ERROR: Max module number exceeded");
+                    else
+                        printf("ERROR: Max moduleconfig number exceeded");
+                    return 1;
+                }
+                module_paths[module_number] = argv[i];
+                module_number++;
+            }
+        }
+        
+    }
+
+    if (module_number == 0)
+    {
+        if (MODULE_IN)
+            printf("ERROR: Specify at least one .module file to import\n");
+        else
+            printf("ERROR: Specify at least one .moduleconfig file to use in export\n");
+        return;
+    }
+
+    printf(PROJECT_PATH);
+    if (MODULE_IN) printf(" in"); else printf(" out");
+    printf(" ");
+    printf(output_path);
+    printf("\n");
+
+    for (int i = 0; i < module_number; i++)
+    {
+        printf(module_paths[i]);
+        printf("\n");
+    }
+
+    return 0;
 
     char* project;
     {
