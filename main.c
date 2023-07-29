@@ -10,11 +10,37 @@
 #define MODULE_SECTIONS_MAX 32
 typedef struct
 {
+    unsigned sections;
+    char name[128];
     char resource_type[MODULE_SECTIONS_MAX][32];
     char path[MODULE_SECTIONS_MAX][256];
 } Module;
 
 typedef enum {false, true} bool;
+
+char* malloc_file(const char* path)
+{
+    FILE* f = fopen(path, "rb");
+    if (ferror(f) || !f)
+    {
+        return NULL;
+    }
+
+    fseek(f, 0, SEEK_END);
+    unsigned size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    if (size == 0)
+    {
+        return NULL;
+    }
+
+    char* buffer = malloc(size+1);
+    fread(buffer, 1, size, f);
+    fclose(f);
+    *(buffer+size) = '\0';
+    return buffer;
+}
 
 char* str_skip_line(char* buffer, char* cursor)
 {
@@ -24,7 +50,7 @@ char* str_skip_line(char* buffer, char* cursor)
     return cursor + 2;
 }
 
-void str_copy_from_to_nullt(char* a, char* b, char* out)
+void strcpy_from_to_nullt(char* a, char* b, char* out)
 {
     unsigned i = 0;
     while (a != b)
@@ -36,7 +62,18 @@ void str_copy_from_to_nullt(char* a, char* b, char* out)
     *(out + i) = '\0';
 }
 
-void str_tag_extract_attr(char* tag, const char* attr_name, char* out)
+int strdist(char* from, char* to)
+{
+    int dist = 0;
+    while (from != to && *from != '\0')
+    {
+        dist++;
+        from++;
+    }
+    return dist;
+}
+
+void xml_tag_extract_attr(char* tag, const char* attr_name, char* out)
 {
     char* attr_cursor_begin;
     attr_cursor_begin = strchr(tag, ' ');
@@ -66,7 +103,7 @@ void str_tag_extract_attr(char* tag, const char* attr_name, char* out)
     if (!attr_cursor_end)
         return;
 
-    str_copy_from_to_nullt(attr_cursor_begin, attr_cursor_end, out);
+    strcpy_from_to_nullt(attr_cursor_begin, attr_cursor_end, out);
 }
 
 // TODO: Add backups
@@ -162,51 +199,45 @@ int main(int argc, char** argv)
         return;
     }
 
-    printf(PROJECT_PATH);
-    if (MODULE_IN) printf(" in"); else printf(" out");
-    printf(" ");
-    printf(output_path);
-    printf("\n");
+    char* project = malloc_file(PROJECT_PATH);
 
+    Module* modules = calloc(sizeof(Module), module_number);
     for (int i = 0; i < module_number; i++)
     {
-        printf(module_paths[i]);
-        printf("\n");
+        char* module_file = malloc_file(module_paths[i]);
+        Module* module = modules + i;
+        char* cursor = module_file;
+        char* start_of_line = NULL;
+        char* end_of_line = NULL;
+        bool invalid_module = false;
+
+        while (*cursor != '\0')
+        {
+            start_of_line = cursor;
+            end_of_line = strstr(cursor, NEWLINE);
+            cursor = strchr(cursor, ',');
+            // TODO: module will be deemed invalid if it doesn't end with a blank newline
+            if (!cursor || !end_of_line || strdist(start_of_line, cursor) >= strdist(start_of_line, end_of_line))
+            {
+                invalid_module = true;
+                break;
+            }
+
+            strcpy_from_to_nullt(start_of_line, cursor, module->resource_type[module->sections]);
+            cursor++;
+            strcpy_from_to_nullt(cursor, end_of_line, module->path[module->sections]);
+            module->sections++;
+            cursor = end_of_line + 2;
+        }
+
+        free(module_file);
+        if (invalid_module)
+        {
+            return 2;
+        }
     }
 
     return 0;
-
-    char* project;
-    {
-        FILE* f = fopen(PROJECT_PATH, "rb");
-        if (!f)
-        {
-            return 1;
-        }
-
-        fseek(f, 0, SEEK_END);
-        unsigned length = ftell(f);
-        fseek(f, 0, SEEK_SET);
-        if (!length)
-        {
-            return 1;
-        }
-
-        project = malloc(length+1);
-        if (!project)
-        {
-            return 1;
-        }
-        *(project+length) = '\0';
-
-        fread(project, sizeof(char), length, f);
-        if (ferror(f))
-        {
-            return 1;
-        }
-
-        fclose(f);
-    }
 
     FILE* module_out = fopen("module.txt", "wb");
     if (ferror(module_out))
@@ -269,15 +300,15 @@ int main(int argc, char** argv)
         if (depth_increase)
         {
             // Look for tag attributes
-            str_copy_from_to_nullt(tag_content_cursor, cursor, tag_content);
+            strcpy_from_to_nullt(tag_content_cursor, cursor, tag_content);
 
             char* tag_content_space = strchr(tag_content, ' ');
             if (tag_content_space)
-                str_copy_from_to_nullt(tag_content, tag_content_space, tag_name);
+                strcpy_from_to_nullt(tag_content, tag_content_space, tag_name);
             else
-                str_copy_from_to_nullt(tag_content_cursor, cursor, tag_name);
+                strcpy_from_to_nullt(tag_content_cursor, cursor, tag_name);
 
-            str_tag_extract_attr(tag_content, "name", attr_name);
+            xml_tag_extract_attr(tag_content, "name", attr_name);
 
             if (!capturing_group && strcmp(tag_name, resource_type) == 0)
             {
