@@ -4,19 +4,35 @@
 #include <stdlib.h>
 
 #define NEWLINE "\r\n"
-#define MODULES_MAX 32
 
-// TODO: Allocate this in dynamic memory
+typedef enum {false, true} bool;
+
+#define MODULES_MAX 32
 #define MODULE_SECTIONS_MAX 32
+#define MODULE_RESOURCE_TYPE_MAX 32
 #define MODULE_RESOURCE_PATH_MAX 256
+// TODO: No need to distinguish between resource type and path
 typedef struct
 {
     unsigned sections;
-    char resource_type[MODULE_SECTIONS_MAX][32];
+    char resource_type[MODULE_SECTIONS_MAX][MODULE_RESOURCE_TYPE_MAX];
     char path[MODULE_SECTIONS_MAX][MODULE_RESOURCE_PATH_MAX];
 } Moduleconfig;
 
-typedef enum {false, true} bool;
+int moduleconfig_find_section(Moduleconfig* moduleconfig, const char* resource_type, const char* path)
+{
+    int section = -1;
+    for (int i = 0; i < moduleconfig->sections; i++)
+    {
+        if (strcmp(resource_type, moduleconfig->resource_type[i]) == 0 &&
+            strcmp(path, moduleconfig->path[i]) == 0)
+        {
+            section = i;
+            break;
+        }
+    }
+    return section;
+}
 
 char* malloc_file(const char* path)
 {
@@ -92,15 +108,17 @@ void strpath_get_filename(char* dest, char* path)
 
 void xml_tag_extract_attr(char* tag, const char* attr_name, char* out)
 {
+    *out = '\0';
     char* attr_cursor_begin;
     attr_cursor_begin = strchr(tag, ' ');
     if (!attr_cursor_begin)
         return;
 
-    attr_cursor_begin++;
+    attr_cursor_begin = strstr(attr_cursor_begin, attr_name);
+    if (!attr_cursor_begin)
+        return;
 
-    char* attr_cursor_end;
-    attr_cursor_end = strchr(attr_cursor_begin, '=');
+    char* attr_cursor_end = strchr(attr_cursor_begin, '=');
     if (!attr_cursor_end)
         return;
 
@@ -158,8 +176,8 @@ int main(int argc, char** argv)
     const bool MODULE_IN = strcmp(argv[2], "in") == 0;
 
     unsigned moduleconfig_number = 0;
-    char* moduleconfig_paths[MODULES_MAX];
-    char* output_path = "";
+    char* moduleconfig_paths[MODULES_MAX] = {'\0'};
+    char* output_path = NULL;
     char current_switch = ' ';
     char module_paths[MODULES_MAX][MODULE_RESOURCE_PATH_MAX] = {'\0'};
 
@@ -282,11 +300,14 @@ int main(int argc, char** argv)
     char* tag_name_begin_cursor;
     char* tag_name_end_cursor;
 
-    int group_depth;
-    char* group_cursor;
+    int section_depth;
+    char* section_cursor;
+    char section_resource_name[MODULE_RESOURCE_TYPE_MAX];
+    char section_resource_path[MODULE_RESOURCE_PATH_MAX];
+
     bool capturing_group = false;
     unsigned module_stream_index = 0;
-    char resource_type[32] = {'\0'};
+    char resource_type[MODULE_RESOURCE_TYPE_MAX] = {'\0'};
     char resource_path[MODULE_RESOURCE_PATH_MAX] = {'\0'};
 
     char tag_content[1024];
@@ -312,8 +333,6 @@ int main(int argc, char** argv)
         if (*(++cursor) == '\0')
             break;
 
-        tag_content_cursor = cursor;
-
         bool depth_increase;
         if (*cursor == '/')
         {
@@ -326,6 +345,8 @@ int main(int argc, char** argv)
             depth++;
             depth_increase = true;
         }
+
+        tag_content_cursor = cursor;
 
         cursor = strchr(cursor, '>');
         if (!cursor)
@@ -343,31 +364,68 @@ int main(int argc, char** argv)
         {
             xml_tag_extract_attr(tag_content, "name", tag_name_attr);
 
-            // This is the depth where resource types begin
+            /*
+                NOTE: Currently the program is treating every tag starting at depth 2
+                as a root folder for resources. It therefore expects every child tag that is named
+                the same as the resource tag to have a name attribute.
+                The program will fail in one way or another if this is not the case
+            */
             if (depth == 2)
             {
                 strcpy(resource_type, tag_name);
-                *(resource_type + strlen(tag_name)) = '\0';
             }
             else if (depth == 3)
             {
-                strcpy(resource_path, tag_name_attr);
+                if (strcmp(tag_name, resource_type) == 0)
+                    strcpy(resource_path, tag_name_attr);
             }
             else if (depth > 3)
             {
-                strcat(resource_path, "/");
-                strcat(resource_path, tag_name_attr);
+                if (strcmp(tag_name, resource_type) == 0)
+                {
+                    strcat(resource_path, "/");
+                    strcat(resource_path, tag_name_attr);
+                }
             }
 
-            if (!capturing_group && strcmp(resource_type, "aoeeusnthoaoeusnth") == 0)
+            if (!capturing_group)
             {
-                group_cursor = tag_begin_cursor;
-                group_depth = depth;
-                capturing_group = true;
+                int section = moduleconfig_find_section(moduleconfigs, resource_type, resource_path);
+                if (section != -1)
+                {
+                    section_cursor = tag_begin_cursor;
+                    section_depth = depth;
+                    capturing_group = true;
+                }
             }
         }
         else
         {
+            if (capturing_group && depth < section_depth)
+            {
+                char* section_cursor_end = cursor + 1;
+                int section_size = strdist(section_cursor, section_cursor_end);
+
+                const char module_section_start_marker[] = "### MODULE SECTION START ###" NEWLINE;
+
+                // TODO: Add correct number of indents to module file
+                fwrite(module_section_start_marker, 1, strlen(module_section_start_marker), module_streams[module_stream_index]);
+                fwrite(resource_type, 1, strlen(resource_type), module_streams[module_stream_index]);
+                fwrite(",", 1, 1, module_streams[module_stream_index]);
+                fwrite(resource_path, 1, strlen(resource_path), module_streams[module_stream_index]);
+                fwrite(NEWLINE, 1, strlen(NEWLINE), module_streams[module_stream_index]);
+                fwrite(section_cursor, 1, section_size + 1, module_streams[module_stream_index]);
+
+                while (*section_cursor_end != '\0')
+                {
+                    *(section_cursor_end - section_size) = *section_cursor_end;
+                    section_cursor_end++;
+                }
+
+                cursor = section_cursor;
+                capturing_group = false;
+            }
+
             if (depth == 1)
             {
                 resource_type[0] = '\0';
@@ -379,28 +437,6 @@ int main(int argc, char** argv)
             else if (depth > 2 && strcmp(resource_type, tag_name) == 0)
             {
                 *(strrchr(resource_path, '/')) = '\0';
-            }
-
-            if (capturing_group && depth < group_depth)
-            {
-                char* group_cursor_end = cursor + 1;
-                int group_size = strdist(group_cursor, group_cursor_end);
-
-                const char module_section_start_marker[] = "### MODULE SECTION START ###" NEWLINE;
-                const char module_section_header[] = "objects" "" NEWLINE;
-
-                fwrite(module_section_start_marker, 1, strlen(module_section_start_marker), module_streams[module_stream_index]);
-                fwrite(module_section_header, 1, strlen(module_section_header), module_streams[module_stream_index]);
-                fwrite(group_cursor, 1, group_size + 1, module_streams[module_stream_index]);
-
-                while (*group_cursor_end != '\0')
-                {
-                    *(group_cursor_end - group_size) = *group_cursor_end;
-                    group_cursor_end++;
-                }
-
-                cursor = group_cursor;
-                capturing_group = false;
             }
         }
     }
