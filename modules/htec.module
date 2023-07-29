@@ -1,6 +1,6 @@
 ### MODULE SECTION START ###
 sprites,HTec
-<sprites name="HTec">
+		<sprites name="HTec">
       <sprite>sprites\spr_HTecAvoidance</sprite>
       <sprite>sprites\spr_HTecAvoidanceCherry</sprite>
       <sprite>sprites\spr_HTecBinoculars</sprite>
@@ -189,8 +189,73 @@ sprites,HTec
       <sprite>sprites\spr_Tiles_HTecFenceWhite15</sprite>
       <sprite>sprites\spr_Tiles_HTecPurple</sprite>
     </sprites>### MODULE SECTION START ###
+scripts,Maker Area Scripts/HTec
+			<scripts name="HTec">
+        <scripts name="HTec general">
+          <script>scripts\htec_get_camera_vars.gml</script>
+          <script>scripts\htec_warp.gml</script>
+          <script>scripts\htec_deathless_set.gml</script>
+          <script>scripts\htec_camera_get_current.gml</script>
+          <script>scripts\htec_camera_swap.gml</script>
+          <script>scripts\htec_deathless_get.gml</script>
+          <script>scripts\htec_deathless_is_challenging.gml</script>
+          <script>scripts\htec_deathless_room.gml</script>
+          <script>scripts\htec_get_spring_color.gml</script>
+          <script>scripts\htec_deathless_stop.gml</script>
+          <script>scripts\htec_get_monochrome_spring_color.gml</script>
+          <script>scripts\htec_map_set_bg_state.gml</script>
+          <script>scripts\htec_railblock_remove_spike.gml</script>
+          <script>scripts\htec_railblock_move.gml</script>
+          <script>scripts\htec_spawn_projectile_rect.gml</script>
+          <script>scripts\htec_spawner_create_destroyer.gml</script>
+          <script>scripts\htec_y0_get_solution.gml</script>
+          <script>scripts\htec_warp_is_unlocked.gml</script>
+          <script>scripts\htec_spawner_create.gml</script>
+          <script>scripts\htec_warp_unlock.gml</script>
+          <script>scripts\htec_spawn_projectile.gml</script>
+          <script>scripts\htec_avoidance_create_cherry.gml</script>
+        </scripts>
+        <scripts name="HTec Black Hole">
+          <script>scripts\htecbh_create_part.gml</script>
+          <script>scripts\htecbh_create_part_array.gml</script>
+          <script>scripts\htecbh_hole.gml</script>
+          <script>scripts\htecbh_clear_area.gml</script>
+          <script>scripts\htecbh_set_part_array.gml</script>
+          <script>scripts\htecbh_hole_old.gml</script>
+          <script>scripts\htecbh_set_reset.gml</script>
+          <script>scripts\htecbh_get_tile_index.gml</script>
+          <script>scripts\htecbh_reposition.gml</script>
+          <script>scripts\htecbh_set_position.gml</script>
+          <script>scripts\htecbh_object_to_particle.gml</script>
+          <script>scripts\htecbh_object_to_particle_ext.gml</script>
+          <script>scripts\htecbh_set_part.gml</script>
+        </scripts>
+        <scripts name="HTec fx">
+          <script>scripts\htecfx_get_tiles_tilemap.gml</script>
+          <script>scripts\htecfx_get_fence_tilemap.gml</script>
+          <script>scripts\htecfx_create.gml</script>
+          <script>scripts\htecfx_toggle_dark.gml</script>
+          <script>scripts\htecfx_is_dark.gml</script>
+          <script>scripts\htecfx_validate_fence.gml</script>
+          <script>scripts\htecfx_validate_gears.gml</script>
+          <script>scripts\htecfx_validate_tv.gml</script>
+          <script>scripts\htecfx_validate_bg.gml</script>
+          <script>scripts\htecfx_get_dark.gml</script>
+          <script>scripts\htecfx_get_fence_tile_index.gml</script>
+          <script>scripts\htecfx_create_corruption.gml</script>
+        </scripts>
+        <scripts name="HTec tv">
+          <script>scripts\tv_get_channel.gml</script>
+          <script>scripts\tv_randomize_channels.gml</script>
+          <script>scripts\tv_set_channel.gml</script>
+          <script>scripts\tv_read_channel.gml</script>
+          <script>scripts\tv_get_solution.gml</script>
+          <script>scripts\tv_set_next_channel.gml</script>
+          <script>scripts\tv_get_random_channels.gml</script>
+        </scripts>
+      </scripts>### MODULE SECTION START ###
 shaders,HTec
-<shaders name="HTec">
+		<shaders name="HTec">
       <shader type="GLSLES">shaders\sh_HTecTV_SinCos.shader</shader>
       <shader type="GLSLES">shaders\sh_HTecTV_Bends.shader</shader>
       <shader type="GLSLES">shaders\sh_HTecTV_GridGrad.shader</shader>
@@ -205,7 +270,7 @@ shaders,HTec
       <shader type="GLSLES">shaders\sh_HTec_Y0.shader</shader>
     </shaders>### MODULE SECTION START ###
 objects,gimmick/maker area specific/Synthas
-<objects name="Synthas">
+				<objects name="Synthas">
           <objects name="Spikes">
             <object>objects\obj_HTecPuzzleSpikeDown</object>
             <object>objects\obj_HTecPuzzleSpikeLeft</object>
@@ -320,7 +385,7 @@ objects,gimmick/maker area specific/Synthas
           <object>objects\obj_HTecY0_Water</object>
         </objects>### MODULE SECTION START ###
 rooms,HTec
-<rooms name="HTec">
+		<rooms name="HTec">
       <room>rooms\rm_HTec01</room>
       <room>rooms\rm_HTec02</room>
       <room>rooms\rm_HTec02r</room>
