@@ -8,13 +8,13 @@
 
 // TODO: Allocate this in dynamic memory
 #define MODULE_SECTIONS_MAX 32
+#define MODULE_RESOURCE_PATH_MAX 256
 typedef struct
 {
     unsigned sections;
-    char name[128];
     char resource_type[MODULE_SECTIONS_MAX][32];
-    char path[MODULE_SECTIONS_MAX][256];
-} Module;
+    char path[MODULE_SECTIONS_MAX][MODULE_RESOURCE_PATH_MAX];
+} Moduleconfig;
 
 typedef enum {false, true} bool;
 
@@ -71,6 +71,23 @@ int strdist(char* from, char* to)
         from++;
     }
     return dist;
+}
+
+void strpath_get_filename(char* dest, char* path)
+{
+    char* name_start = strrchr(path, '/');
+    if (!name_start)
+        name_start = path;
+    else
+        name_start++;
+    
+    char* name_end = strrchr(path, '.');
+    if (!name_end)
+        name_end = strchr(path, '\0');
+    else if (name_start > name_end)
+        return;
+    
+    strcpy_from_to_nullt(name_start, name_end, dest);
 }
 
 void xml_tag_extract_attr(char* tag, const char* attr_name, char* out)
@@ -140,10 +157,11 @@ int main(int argc, char** argv)
 
     const bool MODULE_IN = strcmp(argv[2], "in") == 0;
 
-    unsigned module_number = 0;
-    char* module_paths[MODULES_MAX];
+    unsigned moduleconfig_number = 0;
+    char* moduleconfig_paths[MODULES_MAX];
     char* output_path = "";
     char current_switch = ' ';
+    char module_paths[MODULES_MAX][MODULE_RESOURCE_PATH_MAX] = {'\0'};
 
     for (int i = 3; i < argc; i++)
     {
@@ -175,7 +193,7 @@ int main(int argc, char** argv)
             }
             else
             {
-                if (module_number >= MODULES_MAX)
+                if (moduleconfig_number >= MODULES_MAX)
                 {
                     if (MODULE_IN)
                         printf("ERROR: Max module number exceeded");
@@ -183,14 +201,15 @@ int main(int argc, char** argv)
                         printf("ERROR: Max moduleconfig number exceeded");
                     return 1;
                 }
-                module_paths[module_number] = argv[i];
-                module_number++;
+
+                moduleconfig_paths[moduleconfig_number] = argv[i];
+                moduleconfig_number++;
             }
         }
         
     }
 
-    if (module_number == 0)
+    if (moduleconfig_number == 0)
     {
         if (MODULE_IN)
             printf("ERROR: Specify at least one .module file to import\n");
@@ -200,12 +219,20 @@ int main(int argc, char** argv)
     }
 
     char* project = malloc_file(PROJECT_PATH);
-
-    Module* modules = calloc(sizeof(Module), module_number);
-    for (int i = 0; i < module_number; i++)
+    Moduleconfig* moduleconfigs = calloc(sizeof(Moduleconfig), moduleconfig_number);
+    for (int i = 0; i < moduleconfig_number; i++)
     {
-        char* module_file = malloc_file(module_paths[i]);
-        Module* module = modules + i;
+        { // Extract module destination path
+            strcat(module_paths[i], output_path);
+            strcat(module_paths[i], "/");
+            char module_name[MODULE_RESOURCE_PATH_MAX];
+            strpath_get_filename(module_name, moduleconfig_paths[i]);
+            strcat(module_paths[i], module_name);
+            strcat(module_paths[i], ".module");
+        }
+
+        char* module_file = malloc_file(moduleconfig_paths[i]);
+        Moduleconfig* moduleconfig = moduleconfigs + i;
         char* cursor = module_file;
         char* start_of_line = NULL;
         char* end_of_line = NULL;
@@ -216,17 +243,18 @@ int main(int argc, char** argv)
             start_of_line = cursor;
             end_of_line = strstr(cursor, NEWLINE);
             cursor = strchr(cursor, ',');
-            // TODO: module will be deemed invalid if it doesn't end with a blank newline
+            // TODO: moduleconfig will be deemed invalid if it doesn't end with a blank newline
+            // TODO: do memory address comparisons
             if (!cursor || !end_of_line || strdist(start_of_line, cursor) >= strdist(start_of_line, end_of_line))
             {
                 invalid_module = true;
                 break;
             }
 
-            strcpy_from_to_nullt(start_of_line, cursor, module->resource_type[module->sections]);
+            strcpy_from_to_nullt(start_of_line, cursor, moduleconfig->resource_type[moduleconfig->sections]);
             cursor++;
-            strcpy_from_to_nullt(cursor, end_of_line, module->path[module->sections]);
-            module->sections++;
+            strcpy_from_to_nullt(cursor, end_of_line, moduleconfig->path[moduleconfig->sections]);
+            moduleconfig->sections++;
             cursor = end_of_line + 2;
         }
 
@@ -237,15 +265,17 @@ int main(int argc, char** argv)
         }
     }
 
-    return 0;
-
-    FILE* module_out = fopen("module.txt", "wb");
-    if (ferror(module_out))
+    
+    FILE* module_streams[MODULES_MAX] = {NULL};
+    for (int i = 0; i < moduleconfig_number; i++)
     {
-        return 1;
+        module_streams[i] = fopen(*(module_paths+i), "wb");
+        if (ferror(module_streams[i]) || !module_streams[i])
+        {
+            return 1;
+        }
     }
 
-    char* resource_type = "objects";
     char* cursor = project;
     char* tag_begin_cursor;
     char* tag_content_cursor;
@@ -255,10 +285,14 @@ int main(int argc, char** argv)
     int group_depth;
     char* group_cursor;
     bool capturing_group = false;
+    unsigned module_stream_index = 0;
+    char resource_type[32] = {'\0'};
+    char resource_path[MODULE_RESOURCE_PATH_MAX] = {'\0'};
 
     char tag_content[1024];
     char tag_name[128];
-    char attr_name[128];
+    char tag_name_attr[128];
+
     unsigned depth = 0;
 
     cursor = str_skip_line(project, cursor);
@@ -267,7 +301,7 @@ int main(int argc, char** argv)
     {
         *tag_content = '\0';
         *tag_name = '\0';
-        *attr_name = '\0';
+        *tag_name_attr = '\0';
 
         cursor = strchr(cursor, '<');
         if (!cursor)
@@ -297,20 +331,35 @@ int main(int argc, char** argv)
         if (!cursor)
             break;
 
+        // Look for tag attributes
+        strcpy_from_to_nullt(tag_content_cursor, cursor, tag_content);
+        char* tag_content_space = strchr(tag_content, ' ');
+        if (tag_content_space)
+            strcpy_from_to_nullt(tag_content, tag_content_space, tag_name);
+        else
+            strcpy_from_to_nullt(tag_content_cursor, cursor, tag_name);
+
         if (depth_increase)
         {
-            // Look for tag attributes
-            strcpy_from_to_nullt(tag_content_cursor, cursor, tag_content);
+            xml_tag_extract_attr(tag_content, "name", tag_name_attr);
 
-            char* tag_content_space = strchr(tag_content, ' ');
-            if (tag_content_space)
-                strcpy_from_to_nullt(tag_content, tag_content_space, tag_name);
-            else
-                strcpy_from_to_nullt(tag_content_cursor, cursor, tag_name);
+            // This is the depth where resource types begin
+            if (depth == 2)
+            {
+                strcpy(resource_type, tag_name);
+                *(resource_type + strlen(tag_name)) = '\0';
+            }
+            else if (depth == 3)
+            {
+                strcpy(resource_path, tag_name_attr);
+            }
+            else if (depth > 3)
+            {
+                strcat(resource_path, "/");
+                strcat(resource_path, tag_name_attr);
+            }
 
-            xml_tag_extract_attr(tag_content, "name", attr_name);
-
-            if (!capturing_group && strcmp(tag_name, resource_type) == 0)
+            if (!capturing_group && strcmp(resource_type, "aoeeusnthoaoeusnth") == 0)
             {
                 group_cursor = tag_begin_cursor;
                 group_depth = depth;
@@ -319,19 +368,30 @@ int main(int argc, char** argv)
         }
         else
         {
+            if (depth == 1)
+            {
+                resource_type[0] = '\0';
+            }
+            else if (depth == 2)
+            {
+                resource_path[0] = '\0';
+            }
+            else if (depth > 2 && strcmp(resource_type, tag_name) == 0)
+            {
+                *(strrchr(resource_path, '/')) = '\0';
+            }
+
             if (capturing_group && depth < group_depth)
             {
                 char* group_cursor_end = cursor + 1;
-                int group_size = 0;
-                for (char* ptr = group_cursor; ptr != group_cursor_end; ptr++)
-                    group_size++;
+                int group_size = strdist(group_cursor, group_cursor_end);
 
                 const char module_section_start_marker[] = "### MODULE SECTION START ###" NEWLINE;
                 const char module_section_header[] = "objects" "" NEWLINE;
 
-                fwrite(module_section_start_marker, 1, strlen(module_section_start_marker), module_out);
-                fwrite(module_section_header, 1, strlen(module_section_header), module_out);
-                fwrite(group_cursor, 1, group_size + 1, module_out);
+                fwrite(module_section_start_marker, 1, strlen(module_section_start_marker), module_streams[module_stream_index]);
+                fwrite(module_section_header, 1, strlen(module_section_header), module_streams[module_stream_index]);
+                fwrite(group_cursor, 1, group_size + 1, module_streams[module_stream_index]);
 
                 while (*group_cursor_end != '\0')
                 {
@@ -345,7 +405,10 @@ int main(int argc, char** argv)
         }
     }
 
-    fclose(module_out);
+    for (int i = 0; i < moduleconfig_number; i++)
+    {
+        fclose(module_streams[i]);
+    }
 
     {
         unsigned size = 0;
