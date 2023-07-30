@@ -1,1 +1,1 @@
-main project.gmx in modules/htec.module
+gmcollage project.gmx in modules/htec.module
