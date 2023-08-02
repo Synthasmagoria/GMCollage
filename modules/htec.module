@@ -188,7 +188,7 @@ sprites,HTec
       <sprite>sprites\spr_Tiles_HTecFenceWhite14</sprite>
       <sprite>sprites\spr_Tiles_HTecFenceWhite15</sprite>
       <sprite>sprites\spr_Tiles_HTecPurple</sprite>
-    </sprites>### MODULE SECTION START ###
+    </sprites>### MODULE SECTION START ###
 scripts,Maker Area Scripts/HTec
 			<scripts name="HTec">
         <scripts name="HTec general">
@@ -253,7 +253,7 @@ scripts,Maker Area Scripts/HTec
           <script>scripts\tv_set_next_channel.gml</script>
           <script>scripts\tv_get_random_channels.gml</script>
         </scripts>
-      </scripts>### MODULE SECTION START ###
+      </scripts>### MODULE SECTION START ###
 shaders,HTec
 		<shaders name="HTec">
       <shader type="GLSLES">shaders\sh_HTecTV_SinCos.shader</shader>
@@ -268,7 +268,7 @@ shaders,HTec
       <shader type="GLSLES">shaders\sh_HTec_BlackHole.shader</shader>
       <shader type="GLSLES">shaders\sh_HTec_Background_new.shader</shader>
       <shader type="GLSLES">shaders\sh_HTec_Y0.shader</shader>
-    </shaders>### MODULE SECTION START ###
+    </shaders>### MODULE SECTION START ###
 objects,gimmick/maker area specific/Synthas
 				<objects name="Synthas">
           <objects name="Spikes">
@@ -383,7 +383,7 @@ objects,gimmick/maker area specific/Synthas
           <object>objects\obj_HTecY0_DescentText</object>
           <object>objects\obj_HTecY0_DescentText_Trigger</object>
           <object>objects\obj_HTecY0_Water</object>
-        </objects>### MODULE SECTION START ###
+        </objects>### MODULE SECTION START ###
 rooms,HTec
 		<rooms name="HTec">
       <room>rooms\rm_HTec01</room>
@@ -461,4 +461,4 @@ rooms,HTec
       <room>rooms\rm_HTecY0_Fall02</room>
       <room>rooms\rm_HTecY0_FallFail</room>
       <room>rooms\rm_HTecY0_Puzzle</room>
-    </rooms>
+    </rooms>
