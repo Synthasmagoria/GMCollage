@@ -81,13 +81,13 @@ void strpath_get_filename(char* dest, char* path)
         name_start = path;
     else
         name_start++;
-    
+
     char* name_end = strrchr(path, '.');
     if (!name_end)
         name_end = strchr(path, '\0');
     else if (name_start > name_end)
         return;
-    
+
     strcpy_from_to_nullt(name_start, name_end, dest);
 }
 
@@ -138,7 +138,7 @@ typedef struct
     char resource_type[MODULE_SECTIONS_MAX][MODULE_RESOURCE_TYPE_MAX];
     char resource_path[MODULE_SECTIONS_MAX][MODULE_RESOURCE_PATH_MAX];
     char* buffer; // unused in OUT
-    bool written_sections[MODULE_SECTIONS_MAX]; // unused in OUT
+    bool written_sections[MODULE_SECTIONS_MAX];
 } Module;
 
 // Variables used exclusively when extracting a module from a project.gmx file
@@ -176,7 +176,7 @@ bool module_init_from_buffer(Module* module, char* buffer)
     module->section_number = 0;
     for (int i = 0; i < MODULE_SECTIONS_MAX; i++)
         module->written_sections[i] = false;
-    
+
     char* cursor = module->buffer;
     do {
         cursor = strstr(cursor, MODULE_SECTION_START_MARKER);
@@ -230,7 +230,7 @@ bool module_init_from_config(Module* module, char* buffer)
         // TODO: moduleconfig will be deemed invalid if it doesn't end with a blank newline
         if (!cursor || !end_of_line || cursor > end_of_line)
             return false;
-        
+
         strcpy_from_to_nullt(start_of_line, cursor, module->resource_type[module->section_number]);
         cursor++;
         strcpy_from_to_nullt(cursor, end_of_line, module->resource_path[module->section_number]);
@@ -252,6 +252,7 @@ int main(int argc, char** argv)
             "\n"
             "Optional switches\n"
             "-o <DIR> | Output directory\n"
+            "-f       | Overwrites the existing project instead of creating a new one"
             "\n");
         return 0;
     }
@@ -276,7 +277,7 @@ int main(int argc, char** argv)
     char* file_paths[MODULES_MAX] = {'\0'};
     char* output_path = NULL;
     char current_switch = ' ';
-    
+
     for (int i = 3; i < argc; i++)
     {
         if (current_switch != ' ')
@@ -320,7 +321,7 @@ int main(int argc, char** argv)
                 file_number++;
             }
         }
-        
+
     }
 
     if (file_number == 0)
@@ -336,7 +337,7 @@ int main(int argc, char** argv)
     char* project = malloc_file(PROJECT_PATH);
     Module* modules = calloc(sizeof(Module), file_number);
     FILE* module_streams[MODULES_MAX] = {NULL};
-    
+
     if (MODULE_OUT)
     {
         char module_paths[MODULES_MAX][MODULE_RESOURCE_PATH_MAX] = {'\0'};
@@ -377,13 +378,33 @@ int main(int argc, char** argv)
     }
     else
     {
-        int invalid_modules = 0;
-
-        // TODO: Invalid module diagnostics
+        int invalid_module_number = 0;
+        int non_existent_file_number = 0;
+        
         for (int i = 0; i < file_number; i++)
-            invalid_modules += !module_init_from_buffer(modules + i, malloc_file(file_paths[i]));
+        {
+            char* module_buffer = malloc_file(file_paths[i]);
+            if (module_buffer)
+            {
+                if (!module_init_from_buffer(modules + i, module_buffer))
+                {
+                    invalid_module_number++;
+                    printf("ERROR: Invalid module file at '");
+                    printf(file_paths[i]);
+                    printf("'\n");
+                }
+            }
+            else
+            {
+                non_existent_file_number++;
+                printf("Couldn't open module for reading at '");
+                printf(file_paths[i]);
+                printf("'\n");
+                return 1;
+            }
+        }
 
-        if (invalid_modules)
+        if (invalid_module_number || non_existent_file_number)
         {
             return 2;
         }
@@ -392,7 +413,7 @@ int main(int argc, char** argv)
     FILE* project_out = fopen("project_modified.gmx", "wb");
     char* cursor = project;
     unsigned depth = 0;
-    
+
     // OUT vars
     bool section_capturing = false;
     ModuleSectionStart section;
@@ -515,7 +536,7 @@ int main(int argc, char** argv)
                 {
                     int section_index = -1;
                     int module_index = 0;
-                    
+
                     for (int i = 0; i < file_number; i++)
                     {
                         Module* module = modules + i;
@@ -527,7 +548,7 @@ int main(int argc, char** argv)
 
                             if (strcmp(current_resource_type, module->resource_type[ii]) != 0)
                                 continue;
-                            
+
                             if (strcnt(module->resource_path[ii], '/') > 0)
                             {
                                 char module_resource_folder[MODULE_RESOURCE_PATH_MAX];
@@ -538,9 +559,9 @@ int main(int argc, char** argv)
                                 if (strcmp(module_resource_folder, current_resource_path) != 0)
                                     continue;
                             }
-                            
+
                             // Insert module into project file
-                            
+
 
                             char* module_start_cursor = str_skip_line(module->buffer);
                             for (int iii = 0; iii < ii; iii++)
@@ -559,6 +580,7 @@ int main(int argc, char** argv)
                             write_cursor += fwrite(write_cursor, 1, cursor - write_cursor, project_out);
                             fwrite(NEWLINE, 1, strlen(NEWLINE), project_out);
                             fwrite(module_start_cursor, 1, module_end_cursor - module_start_cursor, project_out);
+                            // TODO: Notify the user of unsuccessful module copies
                             module->written_sections[ii] = true;
                         }
                     }
@@ -597,6 +619,7 @@ int main(int argc, char** argv)
 
                     cursor = section.cursor;
                     section_capturing = false;
+                    section.moduleconfig->written_sections[section.moduleconfig_section_index] = true;
                 }
             }
 
@@ -611,6 +634,24 @@ int main(int argc, char** argv)
 
     if (MODULE_OUT)
     {
+        for (int i = 0; i < file_number; i++)
+        {
+            Module* module = modules + i;
+            for (int ii = 0; ii < module->section_number; ii++)
+            {
+                if (!module->written_sections[ii])
+                {
+                    printf("WARNING: Couldn't find folder '");
+                    printf(module->resource_path[ii]);
+                    printf(",");
+                    printf(module->resource_path[ii]);
+                    printf("' in ");
+                    printf(PROJECT_PATH);
+                    printf("\n");
+                }
+            }
+        }
+
         for (int i = 0; i < file_number; i++)
             fclose(module_streams[i]);
         fwrite(project, 1, strlen(project), project_out);
