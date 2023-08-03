@@ -12,18 +12,14 @@ char* malloc_file(const char* path)
 {
     FILE* f = fopen(path, "rb");
     if (ferror(f) || !f)
-    {
         return NULL;
-    }
 
     fseek(f, 0, SEEK_END);
     unsigned size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
     if (size == 0)
-    {
         return NULL;
-    }
 
     char* buffer = malloc(size+1);
     fread(buffer, 1, size, f);
@@ -74,7 +70,17 @@ int strcnt(char* str, char chr)
     return count;
 }
 
-void strpath_get_filename(char* dest, char* path)
+void strchrrepl(char* str, char replace, char replacement)
+{
+    while (*str != '\0')
+    {
+        if (*str == replace)
+            *str = replacement;
+        str++;
+    }
+}
+
+void strpath_get_filename(char* dest, char* path, bool keep_extension)
 {
     char* name_start = strrchr(path, '/');
     if (!name_start)
@@ -82,13 +88,42 @@ void strpath_get_filename(char* dest, char* path)
     else
         name_start++;
 
-    char* name_end = strrchr(path, '.');
+    char* name_end;
+    if (keep_extension)
+        name_end = strchr(path, '\0');
+    else
+        name_end = strrchr(path, '.');
+
     if (!name_end)
         name_end = strchr(path, '\0');
     else if (name_start > name_end)
         return;
 
     strcpy_from_to_nullt(name_start, name_end, dest);
+}
+
+void strpath_get_directory(char* dest, char* path)
+{
+    char slash = 0;
+    char* directory_end = NULL;
+
+    char* last_backslash = strrchr(path, '/');
+    char* last_forwardslash = strrchr(path, '\\');
+    if (last_backslash)
+    {
+        directory_end = last_backslash;
+        slash = '/';
+    }
+    else if (last_forwardslash)
+    {
+        directory_end = last_forwardslash;
+        slash = '\\';
+    }
+
+    if ((last_backslash && last_forwardslash) || !directory_end)
+        return;
+
+    strcpy_from_to_nullt(path, directory_end, dest);
 }
 
 void xml_tag_extract_attr(char* tag, const char* attr_name, char* out)
@@ -181,28 +216,23 @@ bool module_init_from_buffer(Module* module, char* buffer)
     do {
         cursor = strstr(cursor, MODULE_SECTION_START_MARKER);
         if (!cursor)
-        {
             break;
-        }
+        
         cursor = str_skip_line(cursor);
         if (!cursor)
-        {
             return false;
-        }
+        
         char* param_separator = strchr(cursor, ',');
         if (!param_separator)
-        {
             return false;
-        }
+        
         char* end_of_params = strstr(cursor, NEWLINE);
         if (!end_of_params)
-        {
             return false;
-        }
+        
         if (param_separator + 1 > end_of_params)
-        {
             return false;
-        }
+        
         strcpy_from_to_nullt(cursor, param_separator, module->resource_type[module->section_number]);
         strcpy_from_to_nullt(param_separator + 1, end_of_params, module->resource_path[module->section_number]);
         module->section_number++;
@@ -251,7 +281,8 @@ int main(int argc, char** argv)
             "Providing multiple module/moduleconfig paths can be done with comma separation\n"
             "\n"
             "Optional switches\n"
-            "-o <DIR>   | Output directory\n");
+            "-o <DIR>   | Module output directory (OUT only)\n"
+            "-p <DIR>   | Project output directory (IN/OUT)\n");
         return 0;
     }
 
@@ -261,7 +292,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    const char* PROJECT_PATH = argv[1];
+    char* project_path = argv[1];
+    strchrrepl(project_path, '\\', '/');
 
     if (argc < 3 || (strcmp(argv[2], "in") != 0 && strcmp(argv[2], "out")) != 0)
     {
@@ -273,7 +305,8 @@ int main(int argc, char** argv)
 
     unsigned file_number = 0;
     char* file_paths[MODULES_MAX] = {'\0'};
-    char* output_path = NULL;
+    char module_output_directory[MODULE_RESOURCE_PATH_MAX] = {'\0'};
+    char project_output_directory[MODULE_RESOURCE_PATH_MAX] = {'\0'};
     char current_switch = ' ';
 
     for (int i = 3; i < argc; i++)
@@ -282,8 +315,15 @@ int main(int argc, char** argv)
         {
             switch (current_switch)
             {
-                case 'o': output_path = argv[i]; break;
-                // case 'r': break; TODO: Implement file replacement switch
+                case 'o':
+                if (strcpy_s(module_output_directory, MODULE_RESOURCE_PATH_MAX, argv[i]))
+                    printf("ERROR: Module output path too long");
+                break;
+                
+                case 'r':
+                if (strcpy_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, argv[i]))
+                    printf("ERROR: Project output path too long");
+                break;
             }
             current_switch = ' ';
         }
@@ -294,6 +334,7 @@ int main(int argc, char** argv)
                 switch (argv[i][1])
                 {
                     case 'o':
+                    case 'r':
                     current_switch = argv[i][1];
                     break;
 
@@ -319,7 +360,6 @@ int main(int argc, char** argv)
                 file_number++;
             }
         }
-
     }
 
     if (file_number == 0)
@@ -331,12 +371,21 @@ int main(int argc, char** argv)
         return;
     }
 
-    char* project = malloc_file(PROJECT_PATH);
+    char* project = malloc_file(project_path);
     if (!project)
     {
         printf("ERROR: Couldn't open project file at '");
-        printf(PROJECT_PATH);
+        printf(project_path);
         printf("'\n");
+        return 1;
+    }
+
+    char project_name[MODULE_RESOURCE_PATH_MAX] = {'\0'};
+    strpath_get_filename(project_name, project_path, true);
+    strcat_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, project_name);
+    if (strcat_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, ".new"))
+    {
+        printf("ERROR: Project name was too long");
         return 1;
     }
 
@@ -351,33 +400,51 @@ int main(int argc, char** argv)
         for (int i = 0; i < file_number; i++)
         {
             { // Extract module destination path
-                strcat(module_paths[i], output_path);
-                strcat(module_paths[i], "/");
+                strcat(module_paths[i], module_output_directory);
                 char module_name[MODULE_RESOURCE_PATH_MAX];
-                strpath_get_filename(module_name, file_paths[i]);
+                strpath_get_filename(module_name, file_paths[i], false);
                 strcat(module_paths[i], module_name);
                 strcat(module_paths[i], ".module");
             }
 
-            char* module_file = malloc_file(file_paths[i]);
             Module* moduleconfig = modules + i;
-            int invalid_modules = 0;
+            int unreadable_moduleconfig_number = 0;
+            int invalid_moduleconfig_number = 0;
 
             for (int i = 0; i < file_number; i++)
-                invalid_modules += (!module_init_from_config(modules + i, malloc_file(file_paths[i])));
-
-            free(module_file);
-            if (invalid_modules)
             {
-                return 2;
+                char* moduleconfig_buffer = malloc_file(file_paths[i]);
+                if (!moduleconfig_buffer)
+                {
+                    unreadable_moduleconfig_number++;
+                    printf("ERROR: Invalid moduleconfig at '");
+                    printf(file_paths[i]);
+                    printf("'\n");
+                    continue;
+                }
+
+                if (!module_init_from_config(modules + i, moduleconfig_buffer))
+                {
+                    invalid_moduleconfig_number++;
+                    printf("ERROR: Couldn't open moduleconfig for reading at '");
+                    printf(file_paths[i]);
+                    printf("'\n");
+                    continue;
+                }
             }
+
+            if (unreadable_moduleconfig_number || invalid_moduleconfig_number)
+                return 1;
         }
 
         for (int i = 0; i < file_number; i++)
         {
-            module_streams[i] = fopen(*(module_paths+i), "wb");
-            if (ferror(module_streams[i]) || !module_streams[i])
+            module_streams[i] = fopen(module_paths[i], "wb");
+            if (!module_streams[i] || ferror(module_streams[i]))
             {
+                printf("ERROR: Couldn't open module for writing at '");
+                printf(module_paths[i]);
+                printf("'\n");
                 return 1;
             }
         }
@@ -385,42 +452,39 @@ int main(int argc, char** argv)
     else
     {
         int invalid_module_number = 0;
-        int non_existent_file_number = 0;
+        int unreadable_module_number = 0;
 
         for (int i = 0; i < file_number; i++)
         {
             char* module_buffer = malloc_file(file_paths[i]);
-            if (module_buffer)
+            if (!module_buffer)
             {
-                if (!module_init_from_buffer(modules + i, module_buffer))
-                {
-                    invalid_module_number++;
-                    printf("ERROR: Invalid module file at '");
-                    printf(file_paths[i]);
-                    printf("'\n");
-                }
-            }
-            else
-            {
-                non_existent_file_number++;
+                unreadable_module_number++;
                 printf("Couldn't open module for reading at '");
                 printf(file_paths[i]);
                 printf("'\n");
-                return 1;
+                continue;
+            }
+
+            if (!module_init_from_buffer(modules + i, module_buffer))
+            {
+                invalid_module_number++;
+                printf("ERROR: Invalid module file at '");
+                printf(file_paths[i]);
+                printf("'\n");
+                continue;
             }
         }
 
-        if (invalid_module_number || non_existent_file_number)
-        {
-            return 2;
-        }
+        if (invalid_module_number || unreadable_module_number)
+            return 1;
     }
 
-    FILE* project_out = fopen("project_modified.gmx", "wb");
+    FILE* project_out = fopen(project_output_directory, "wb");
     char* cursor = project;
     unsigned depth = 0;
 
-    // OUT vars
+    // OUT
     bool section_capturing = false;
     ModuleSectionStart section;
     section.depth = -1;
@@ -429,7 +493,7 @@ int main(int argc, char** argv)
     section.moduleconfig = NULL;
     section.moduleconfig_section_index = -1;
 
-    // IN vars
+    // IN
     char* write_cursor = cursor;
 
     char current_resource_type[MODULE_RESOURCE_TYPE_MAX] = {'\0'};
@@ -437,6 +501,7 @@ int main(int argc, char** argv)
 
     cursor = str_skip_line(cursor);
 
+    // TODO: Corrupted project file diagnostics
     while (cursor)
     {
         cursor = strchr(cursor, '<');
@@ -652,7 +717,7 @@ int main(int argc, char** argv)
                     printf(",");
                     printf(module->resource_path[ii]);
                     printf("' in ");
-                    printf(PROJECT_PATH);
+                    printf(project_path);
                     printf("\n");
                 }
             }

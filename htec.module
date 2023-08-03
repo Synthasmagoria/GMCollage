@@ -271,6 +271,12 @@ shaders,HTec
     </shaders>### MODULE SECTION START ###
 objects,gimmick/maker area specific/Synthas
 				<objects name="Synthas">
+          <objects name="Blocks">
+            <object>objects\obj_HTecBlock24px</object>
+            <object>objects\obj_HTecBlock24px_move</object>
+            <object>objects\obj_HTecDeathlessBlock</object>
+            <object>objects\obj_HTecRailBlock</object>
+          </objects>
           <objects name="Spikes">
             <object>objects\obj_HTecPuzzleSpikeDown</object>
             <object>objects\obj_HTecPuzzleSpikeLeft</object>
