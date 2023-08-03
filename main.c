@@ -251,9 +251,7 @@ int main(int argc, char** argv)
             "Providing multiple module/moduleconfig paths can be done with comma separation\n"
             "\n"
             "Optional switches\n"
-            "-o <DIR> | Output directory\n"
-            "-f       | Overwrites the existing project instead of creating a new one"
-            "\n");
+            "-o <DIR>   | Output directory\n");
         return 0;
     }
 
@@ -333,8 +331,16 @@ int main(int argc, char** argv)
         return;
     }
 
-    // Out / in initialization
     char* project = malloc_file(PROJECT_PATH);
+    if (!project)
+    {
+        printf("ERROR: Couldn't open project file at '");
+        printf(PROJECT_PATH);
+        printf("'\n");
+        return 1;
+    }
+
+    // Out / in initialization
     Module* modules = calloc(sizeof(Module), file_number);
     FILE* module_streams[MODULES_MAX] = {NULL};
 
@@ -380,7 +386,7 @@ int main(int argc, char** argv)
     {
         int invalid_module_number = 0;
         int non_existent_file_number = 0;
-        
+
         for (int i = 0; i < file_number; i++)
         {
             char* module_buffer = malloc_file(file_paths[i]);
