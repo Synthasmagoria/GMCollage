@@ -407,6 +407,11 @@ int main(int argc, char** argv)
         {
             { // Extract module destination path
                 strcat(module_paths[i], module_output_directory);
+
+                char* last_slash = strrchr(module_output_directory, '/');
+                if (last_slash == NULL || (last_slash - module_output_directory) != strlen(module_output_directory) - 1)
+                    strcat(module_paths[i], "/");
+                
                 char module_name[MODULE_RESOURCE_PATH_MAX];
                 strpath_get_filename(module_name, file_paths[i], false);
                 strcat(module_paths[i], module_name);
@@ -638,8 +643,6 @@ int main(int argc, char** argv)
                             }
 
                             // Insert module into project file
-
-
                             char* module_start_cursor = str_skip_line(module->buffer);
                             for (int iii = 0; iii < ii; iii++)
                             {

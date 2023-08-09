@@ -7,3 +7,4 @@ Valid asset types in moduleconfig files are:
  - fonts
  - objects
  - rooms
+ 
