@@ -1,0 +1,1 @@
+gmcollage "../project.gmx" out synthas.moduleconfig

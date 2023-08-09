@@ -1,1 +1,0 @@
-gmcollage project.gmx out -o modules modules/htec.moduleconfig

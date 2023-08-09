@@ -282,7 +282,8 @@ int main(int argc, char** argv)
             "\n"
             "Optional switches\n"
             "-o <DIR>   | Module output directory (OUT only)\n"
-            "-p <DIR>   | Project output directory (IN/OUT)\n");
+            "-p <DIR>   | Project output directory (IN/OUT)\n"
+            "-f         | Overwrite project if in same directory");
         return 0;
     }
 
@@ -308,6 +309,7 @@ int main(int argc, char** argv)
     char module_output_directory[MODULE_RESOURCE_PATH_MAX] = {'\0'};
     char project_output_directory[MODULE_RESOURCE_PATH_MAX] = {'\0'};
     char current_switch = ' ';
+    bool overwrite = false;
 
     for (int i = 3; i < argc; i++)
     {
@@ -320,7 +322,7 @@ int main(int argc, char** argv)
                     printf("ERROR: Module output path too long");
                 break;
                 
-                case 'r':
+                case 'p':
                 if (strcpy_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, argv[i]))
                     printf("ERROR: Project output path too long");
                 break;
@@ -334,8 +336,12 @@ int main(int argc, char** argv)
                 switch (argv[i][1])
                 {
                     case 'o':
-                    case 'r':
+                    case 'p':
                     current_switch = argv[i][1];
+                    break;
+
+                    case 'f':
+                    overwrite = true;
                     break;
 
                     default:
@@ -383,7 +389,7 @@ int main(int argc, char** argv)
     char project_name[MODULE_RESOURCE_PATH_MAX] = {'\0'};
     strpath_get_filename(project_name, project_path, true);
     strcat_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, project_name);
-    if (strcat_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, ".new"))
+    if (!overwrite && strcat_s(project_output_directory, MODULE_RESOURCE_PATH_MAX, ".new"))
     {
         printf("ERROR: Project name was too long");
         return 1;
