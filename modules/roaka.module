@@ -1,0 +1,58 @@
+### MODULE SECTION START ###
+sprites,Roaka
+		<sprites name="Roaka">
+      <sprite>sprites\sprvinegrayL</sprite>
+      <sprite>sprites\sprvinegrayR</sprite>
+      <sprite>sprites\sprJButtonOff</sprite>
+      <sprite>sprites\sprJButtonOn</sprite>
+      <sprite>sprites\sprJrockerRukitoBlock</sprite>
+      <sprite>sprites\sprJTDS</sprite>
+      <sprite>sprites\sprJTLS</sprite>
+      <sprite>sprites\sprJTriggerPlatform</sprite>
+      <sprite>sprites\sprJTRS</sprite>
+      <sprite>sprites\sprJTUS</sprite>
+      <sprite>sprites\sprWaterUnrefreshing</sprite>
+      <sprite>sprites\sprBWWater</sprite>
+    </sprites>### MODULE SECTION START ###
+objects,Roaka
+		<objects name="Roaka">
+      <object>objects\objJrockerVineL</object>
+      <object>objects\objJrockerVineR</object>
+      <object>objects\objReboundBlock</object>
+      <object>objects\objWaterUnrefreshing</object>
+      <object>objects\oJABounce1</object>
+      <object>objects\oJABounce2</object>
+      <object>objects\oJACurve</object>
+      <object>objects\oJACurveS</object>
+      <object>objects\oJAppleMove1</object>
+      <object>objects\oJARotate</object>
+      <object>objects\oJButton</object>
+      <object>objects\oJFallTrap</object>
+      <object>objects\oJMUS</object>
+      <object>objects\oJMUSpath</object>
+      <object>objects\oJMWater2</object>
+      <object>objects\oJMWater2Throwback</object>
+      <object>objects\oJRotate2S</object>
+      <object>objects\oJSuperCurve</object>
+      <object>objects\oJSuperCurveS</object>
+      <object>objects\oJTDS</object>
+      <object>objects\oJTLS</object>
+      <object>objects\oJTrigger</object>
+      <object>objects\oJTriggerApple</object>
+      <object>objects\oJTriggerPlatform</object>
+      <object>objects\oJTRS</object>
+      <object>objects\oJTUS</object>
+    </objects>### MODULE SECTION START ###
+rooms,Roaka
+		<rooms name="Roaka">
+      <room>rooms\rJrockerHub</room>
+      <room>rooms\rJrockerRukito1</room>
+      <room>rooms\rJrockerRukito2</room>
+      <room>rooms\rJrockerRukito3</room>
+      <room>rooms\rJrockerSpin1</room>
+      <room>rooms\rJrockerSpin2</room>
+      <room>rooms\rJrockerSpin3</room>
+      <room>rooms\rJrockerThrowback1</room>
+      <room>rooms\rJrockerThrowback2</room>
+      <room>rooms\rJrockerThrowback3</room>
+    </rooms>

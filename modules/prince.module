@@ -1,0 +1,84 @@
+### MODULE SECTION START ###
+sprites,Prince
+		<sprites name="Prince">
+      <sprite>sprites\sprPrince_BlackSprite</sprite>
+      <sprite>sprites\sprPrince_ElevatorTrigger</sprite>
+      <sprite>sprites\sprPrince_ElevatorTriggerWhite</sprite>
+      <sprite>sprites\sprPrince_HueShiftMask</sprite>
+      <sprite>sprites\sprPrince_ImpactRing</sprite>
+      <sprite>sprites\sprPrince_SampleSecretItem</sprite>
+      <sprite>sprites\sprPrince_Save</sprite>
+      <sprite>sprites\sprPrince_SaveFlip</sprite>
+      <sprite>sprites\sprPrince_SpikeDown</sprite>
+      <sprite>sprites\sprPrince_SpikeDownCut</sprite>
+      <sprite>sprites\sprPrince_SpikeHitboxDown</sprite>
+      <sprite>sprites\sprPrince_SpikeHitboxLeft</sprite>
+      <sprite>sprites\sprPrince_SpikeHitboxRight</sprite>
+      <sprite>sprites\sprPrince_SpikeHitboxUp</sprite>
+      <sprite>sprites\sprPrince_SpikeLeft</sprite>
+      <sprite>sprites\sprPrince_SpikeLeftCut</sprite>
+      <sprite>sprites\sprPrince_SpikeRight</sprite>
+      <sprite>sprites\sprPrince_SpikeRightCut</sprite>
+      <sprite>sprites\sprPrince_SpikeUp</sprite>
+      <sprite>sprites\sprPrince_SpikeUpCut</sprite>
+      <sprite>sprites\sprPrince_WaterElevator</sprite>
+      <sprite>sprites\sprPrince_WaterUnrefreshing</sprite>
+      <sprite>sprites\sprPrince_RiftMask</sprite>
+    </sprites>### MODULE SECTION START ###
+shaders,Prince
+		<shaders name="Prince">
+      <shader type="GLSLES">shaders\shPrinceHueShift.shader</shader>
+      <shader type="GLSLES">shaders\shPrinceCloudsFade.shader</shader>
+      <shader type="GLSLES">shaders\shPrincePinch.shader</shader>
+    </shaders>### MODULE SECTION START ###
+objects,Prince
+		<objects name="Prince">
+      <object>objects\objPrince_BgCloudsFlippedHandler</object>
+      <object>objects\objPrince_BgCloudsFlippedMarker</object>
+      <object>objects\objPrince_BgCloudsHandler</object>
+      <object>objects\objPrince_BgCloudsHandlerCorner</object>
+      <object>objects\objPrince_BgCloudsHandlerParent</object>
+      <object>objects\objPrince_BgCloudsHandlerTopCorner</object>
+      <object>objects\objPrince_BgCloudsLeftHandler</object>
+      <object>objects\objPrince_BgCloudsLeftMarker</object>
+      <object>objects\objPrince_BgCloudsMarker</object>
+      <object>objects\objPrince_BgShiftHandler</object>
+      <object>objects\objPrince_BgShiftMarker</object>
+      <object>objects\objPrince_DarknessFade</object>
+      <object>objects\objPrince_DelayedWarpEvent</object>
+      <object>objects\objPrince_Elevator</object>
+      <object>objects\objPrince_ElevatorTrigger</object>
+      <object>objects\objPrince_ElevatorTriggerWhite</object>
+      <object>objects\objPrince_HueShaderHandler</object>
+      <object>objects\objPrince_HueShiftMarker</object>
+      <object>objects\objPrince_ImpactRing</object>
+      <object>objects\objPrince_Killer</object>
+      <object>objects\objPrince_OutsideRoomChanger</object>
+      <object>objects\objPrince_Rift</object>
+      <object>objects\objPrince_SampleSecretItem</object>
+      <object>objects\objPrince_Save</object>
+      <object>objects\objPrince_SaveFlip</object>
+      <object>objects\objPrince_SpikeDown</object>
+      <object>objects\objPrince_SpikeLeft</object>
+      <object>objects\objPrince_SpikeRight</object>
+      <object>objects\objPrince_SpikeUp</object>
+      <object>objects\objPrince_WaterElevatorUp</object>
+      <object>objects\objPrince_WaterUnrefreshing</object>
+    </objects>### MODULE SECTION START ###
+rooms,Prince
+		<rooms name="Prince">
+      <room>rooms\rPrince1</room>
+      <room>rooms\rPrince2</room>
+      <room>rooms\rPrince3</room>
+      <room>rooms\rPrince4</room>
+      <room>rooms\rPrince5</room>
+      <room>rooms\rPrince6</room>
+      <room>rooms\rPrince7</room>
+      <room>rooms\rPrince8</room>
+      <room>rooms\rPrinceEnd</room>
+      <room>rooms\rPrinceSecret</room>
+      <room>rooms\rPrinceSecretEnd</room>
+      <room>rooms\rPrinceStart</room>
+      <room>rooms\rPrinceTemplate</room>
+      <room>rooms\rPrinceTest</room>
+    </rooms>

@@ -1,0 +1,111 @@
+### MODULE SECTION START ###
+sounds,Wspr
+		<sounds name="Wspr">
+      <sound>sound\sndShootRefresher</sound>
+      <sound>sound\sndWsprTrigger</sound>
+    </sounds>### MODULE SECTION START ###
+sprites,Wspr
+		<sprites name="Wspr">
+      <sprites name="Old Stage">
+        <sprite>sprites\sprWsprCherry</sprite>
+        <sprite>sprites\sprWsprWater2</sprite>
+        <sprite>sprites\sprWsprWater3</sprite>
+        <sprite>sprites\sprSpotlightC</sprite>
+      </sprites>
+      <sprites name="New Stage">
+        <sprites name="Hazards">
+          <sprite>sprites\sprWsprSpike</sprite>
+          <sprite>sprites\sprWsprSpike2</sprite>
+          <sprite>sprites\sprWsprSpike3</sprite>
+          <sprite>sprites\sprWsprMini</sprite>
+          <sprite>sprites\sprWsprMini2</sprite>
+          <sprite>sprites\sprWsprMini3</sprite>
+          <sprite>sprites\sprWsprCherry1</sprite>
+          <sprite>sprites\sprWsprCherry2</sprite>
+        </sprites>
+        <sprites name="Gimmick">
+          <sprite>sprites\sprWsprPlatform</sprite>
+          <sprite>sprites\sprWsprShootWarp</sprite>
+          <sprite>sprites\sprWsprPlatform2</sprite>
+          <sprite>sprites\sprWsprTrigger1</sprite>
+          <sprite>sprites\sprWsprTrigger2</sprite>
+          <sprite>sprites\sprWsprTrigger3</sprite>
+          <sprite>sprites\sprWsprVine</sprite>
+          <sprite>sprites\sprWsprWhite</sprite>
+          <sprite>sprites\sprWsprSave1</sprite>
+          <sprite>sprites\sprWsprSave2</sprite>
+          <sprite>sprites\sprWsprSave3</sprite>
+          <sprite>sprites\sprWsprGravityUp</sprite>
+          <sprite>sprites\sprWsprGravityUp2</sprite>
+          <sprite>sprites\sprWsprGravityDown</sprite>
+          <sprite>sprites\sprWsprGravityDown2</sprite>
+          <sprite>sprites\sprWsprJumpRefresher1</sprite>
+          <sprite>sprites\sprWsprJumpRefresher2</sprite>
+        </sprites>
+        <sprites name="Background">
+          <sprite>sprites\sprWsprLineLight</sprite>
+          <sprite>sprites\sprWsprLineLight64</sprite>
+          <sprite>sprites\sprWsprTracer</sprite>
+          <sprite>sprites\sprWsprDust</sprite>
+          <sprite>sprites\sprWsprWood</sprite>
+          <sprite>sprites\sprWsprWallpaper</sprite>
+          <sprite>sprites\sprWsprVignette</sprite>
+        </sprites>
+      </sprites>
+    </sprites>### MODULE SECTION START ###
+objects,Wspr
+		<objects name="Wspr">
+      <objects name="Old">
+        <object>objects\objWsprSpotlight</object>
+        <object>objects\objWsprWater2</object>
+        <object>objects\objWsprCherry</object>
+        <object>objects\objWsprWater3</object>
+        <object>objects\objWsprSave</object>
+      </objects>
+      <objects name="New">
+        <object>objects\objWsprBG</object>
+        <object>objects\objWsprBG2</object>
+        <object>objects\objWsprBG3</object>
+        <object>objects\objWsprBGDust1</object>
+        <object>objects\objWsprBGDust2</object>
+        <object>objects\objWsprBGPart</object>
+        <object>objects\objWsprShootWarp</object>
+        <object>objects\objWsprTrigger</object>
+        <object>objects\objWsprWaterEffect</object>
+        <object>objects\objWsprUnravel</object>
+      </objects>
+    </objects>### MODULE SECTION START ###
+rooms,Wspr
+		<rooms name="Wspr">
+      <rooms name="New">
+        <room>rooms\rWsprNewIntro1</room>
+        <room>rooms\rWsprNew1</room>
+        <room>rooms\rWsprNew2</room>
+        <room>rooms\rWsprNew3</room>
+        <room>rooms\rWsprNew4</room>
+        <room>rooms\rWsprNew5</room>
+        <room>rooms\rWsprNew6</room>
+        <room>rooms\rWsprNew7</room>
+        <room>rooms\rWsprNew8</room>
+        <room>rooms\rWsprNew9</room>
+        <room>rooms\rWsprNew10</room>
+        <room>rooms\rWsprNew11</room>
+        <room>rooms\rWsprNew12</room>
+        <room>rooms\rWsprNew13</room>
+        <room>rooms\rWsprNew14</room>
+        <room>rooms\rWsprNew15</room>
+        <room>rooms\rWsprNewEnd1</room>
+      </rooms>
+      <rooms name="Old">
+        <room>rooms\rWspr1</room>
+        <room>rooms\rWspr2</room>
+        <room>rooms\rWspr3</room>
+        <room>rooms\rWspr4</room>
+        <room>rooms\rWspr5</room>
+        <room>rooms\rWspr6</room>
+        <room>rooms\rWspr7</room>
+        <room>rooms\rWspr8</room>
+        <room>rooms\rWspr9</room>
+        <room>rooms\rWspr10</room>
+      </rooms>
+    </rooms>

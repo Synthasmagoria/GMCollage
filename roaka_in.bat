@@ -1,1 +1,2 @@
-gmcollage "../project.gmx" in -f -p "../" "modules/roaka.module"
+gmcollage "../NNB2-hub.project.gmx" in -f -p "../" "modules/roaka.module"
+pause

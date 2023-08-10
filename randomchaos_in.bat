@@ -1,1 +1,2 @@
-gmcollage "../project.gmx" in -f -p "../" "modules/randomchaos.module"
+gmcollage "../NNB2-hub.project.gmx" in -f -p "../" "modules/randomchaos.module"
+pause

@@ -1,0 +1,171 @@
+### MODULE SECTION START ###
+sounds,Very Cool
+		<sounds name="Very Cool">
+      <sound>sound\very_Drums</sound>
+      <sound>sound\very_SaveSound</sound>
+      <sound>sound\very_Shoot</sound>
+      <sound>sound\very_Stomp</sound>
+      <sound>sound\very_Ding</sound>
+    </sounds>### MODULE SECTION START ###
+sprites,Very Cool
+		<sprites name="Very Cool">
+      <sprites name="custom Spikes and blocks">
+        <sprite>sprites\very_Cherry</sprite>
+        <sprites name="cherry">
+          <sprite>sprites\very_sprCherryAzure</sprite>
+          <sprite>sprites\very_sprCherryChartreuse</sprite>
+          <sprite>sprites\very_sprCherryEmerald</sprite>
+          <sprite>sprites\very_sprCherryYellow</sprite>
+          <sprite>sprites\very_sprCherryBlue</sprite>
+          <sprite>sprites\very_sprCherryViolet</sprite>
+          <sprite>sprites\very_sprCherryGreen</sprite>
+          <sprite>sprites\very_sprCherryOrange</sprite>
+          <sprite>sprites\very_sprCherryCyan</sprite>
+          <sprite>sprites\very_sprCherryMagenta</sprite>
+          <sprite>sprites\very_sprCherryPink</sprite>
+          <sprite>sprites\very_CherryWhite</sprite>
+        </sprites>
+        <sprite>sprites\very_1left</sprite>
+        <sprite>sprites\very_1minDown</sprite>
+        <sprite>sprites\very_1minRight</sprite>
+        <sprite>sprites\very_1minLeft</sprite>
+        <sprite>sprites\very_1right</sprite>
+        <sprite>sprites\very_spr8pxUp</sprite>
+        <sprite>sprites\very_1minUp</sprite>
+        <sprite>sprites\very_1up</sprite>
+        <sprite>sprites\very_BlueSpike</sprite>
+        <sprite>sprites\very_DarkSpike</sprite>
+        <sprite>sprites\very_1down</sprite>
+      </sprites>
+      <sprites name="gimmicks">
+        <sprite>sprites\very_sprCherryShooter</sprite>
+        <sprite>sprites\very_SlipBlockBLUE</sprite>
+        <sprite>sprites\very_BillRight</sprite>
+        <sprite>sprites\very_SlipBlockGREEN</sprite>
+        <sprite>sprites\very_sprGhostRefresher</sprite>
+        <sprite>sprites\very_BillLeft</sprite>
+        <sprite>sprites\very_BillUp</sprite>
+        <sprite>sprites\very_sprCherryStopper</sprite>
+        <sprite>sprites\very_sprGreenArrow</sprite>
+        <sprite>sprites\very_sprCherryShooterNotDestroy</sprite>
+        <sprite>sprites\very_sprCwater</sprite>
+        <sprite>sprites\very_BillDown</sprite>
+        <sprite>sprites\very_sprCherryPlatform</sprite>
+      </sprites>
+      <sprites name="other things">
+        <sprite>sprites\very_PaintingSprites</sprite>
+        <sprite>sprites\very_OmoriDead</sprite>
+        <sprite>sprites\very_GraySign</sprite>
+        <sprite>sprites\very_Omori</sprite>
+        <sprite>sprites\very_BlackSquare</sprite>
+        <sprite>sprites\very_ReadMe</sprite>
+        <sprite>sprites\very_KidForward</sprite>
+        <sprite>sprites\very_SmallDown</sprite>
+      </sprites>
+    </sprites>### MODULE SECTION START ###
+scripts,Very Cool
+		<scripts name="Very Cool">
+      <script>scripts\very_FlipJump.gml</script>
+      <script>scripts\very_scrDrawShadow.gml</script>
+      <script>scripts\very_Rect.gml</script>
+      <script>scripts\very_MakeStar.gml</script>
+      <script>scripts\very_PieSlice.gml</script>
+      <script>scripts\very_CherryFunny.gml</script>
+      <script>scripts\very_KillGhost.gml</script>
+      <script>scripts\very_ProductionValue.gml</script>
+      <script>scripts\very_script1.gml</script>
+      <script>scripts\very_FadeChanger_transition.gml</script>
+    </scripts>### MODULE SECTION START ###
+objects,Very Cool
+		<objects name="Very Cool">
+      <objects name="bullet bills">
+        <object>objects\very_BreakBlock</object>
+        <object>objects\very_BulletSpikeRight</object>
+        <object>objects\very_BulletSpikeUp</object>
+        <object>objects\very_BulletSpikeLeft</object>
+        <object>objects\very_BulletSpikeDown</object>
+      </objects>
+      <objects name="cherry platform">
+        <object>objects\very_CherryPlatform</object>
+        <object>objects\very_CherryShooterCircle</object>
+        <object>objects\very_CherryPlayer</object>
+        <object>objects\very_CherryShooter</object>
+        <object>objects\very_CherryShooterNotDestroy</object>
+        <object>objects\very_CherryStopper</object>
+        <object>objects\very_DudCherry</object>
+      </objects>
+      <objects name="cycle killers">
+        <object>objects\very_CherryCircle</object>
+        <object>objects\very_CherryNotDestroyOutsideRoom</object>
+        <object>objects\very_CherryCircleColored</object>
+      </objects>
+      <objects name="hub">
+        <object>objects\very_Paintings</object>
+        <object>objects\very_EnterStage</object>
+        <object>objects\very_CutsceneControl</object>
+      </objects>
+      <objects name="production value">
+        <object>objects\very_BGobject</object>
+        <object>objects\very_BGobject2</object>
+        <object>objects\very_Autotiler1</object>
+        <object>objects\very_Autotiler2</object>
+        <object>objects\very_DropShadow</object>
+        <object>objects\very_objFaller</object>
+      </objects>
+      <objects name="reprise">
+        <object>objects\very_FlipStart</object>
+        <object>objects\very_SinglePlatform</object>
+        <object>objects\very_FlipPlayer</object>
+      </objects>
+      <objects name="spirit things">
+        <object>objects\very_PlayerPhase</object>
+        <object>objects\very_GhostCollectable</object>
+        <object>objects\very_GhostCollectableOld</object>
+        <object>objects\very_DeathDust</object>
+        <object>objects\very_Dust</object>
+        <object>objects\very_Water4</object>
+        <object>objects\very_Water4V</object>
+        <object>objects\very_PlayerPhaseNew</object>
+      </objects>
+      <objects name="toch">
+        <object>objects\very_Cwater</object>
+        <object>objects\very_TOCH</object>
+        <object>objects\very_TOCHsingle</object>
+      </objects>
+      <object>objects\very_Credits</object>
+      <object>objects\very_FadeChanger</object>
+      <object>objects\very_OutsideNextChanger</object>
+      <object>objects\very_OutsidePrevChanger</object>
+      <object>objects\very_OutsideSameChanger</object>
+      <object>objects\very_Save</object>
+      <object>objects\very_SaveEffect</object>
+      <object>objects\very_Sign</object>
+    </objects>### MODULE SECTION START ###
+rooms,Very Cool
+		<rooms name="Very Cool">
+      <room>rooms\rHub1</room>
+      <rooms name="union jack">
+        <room>rooms\rPlatformTutorial</room>
+        <room>rooms\rPlatform1</room>
+        <room>rooms\rPlatform2</room>
+        <room>rooms\rPlatform3</room>
+        <room>rooms\rPlatform4</room>
+        <room>rooms\rPlatform5</room>
+        <room>rooms\rPlatformWhat</room>
+        <room>rooms\rOffscreen1</room>
+        <room>rooms\rOffscreen4</room>
+      </rooms>
+      <rooms name="return of the toch block">
+        <room>rooms\rFactoryIntro</room>
+        <room>rooms\rFactory1</room>
+        <room>rooms\rFactory2</room>
+        <room>rooms\rFactory3</room>
+      </rooms>
+      <rooms name="function over form">
+        <room>rooms\rBillTutorial</room>
+        <room>rooms\rBillTower</room>
+      </rooms>
+      <room>rooms\rVCS2Credits</room>
+      <room>rooms\rUnclear</room>
+      <room>rooms\rExtraVC</room>
+    </rooms>

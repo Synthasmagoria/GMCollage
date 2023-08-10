@@ -1,1 +1,2 @@
-gmcollage "../project.gmx" in -f -p "../" "modules/verycool.module"
+gmcollage "../NNB2-hub.project.gmx" in -f -p "../" "modules/verycool.module"
+pause
