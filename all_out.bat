@@ -1,2 +1,0 @@
-gmcollage "../NNB2-hub.project.gmx" out -f -p "../" -o "modules" "modules/dono.moduleconfig" "modules/ianboy141.moduleconfig" "modules/prince.moduleconfig" "modules/randomchaos.moduleconfig" "modules/roaka.moduleconfig" "modules/synthas.moduleconfig" "modules/verycool.moduleconfig" "modules/wspr.moduleconfig"
-pause
