@@ -278,7 +278,7 @@ int main(int argc, char** argv)
         printf(
             "################## GMCOLLAGE ##################\n"
             "Usage: gmcollage <project.gmx> in/out <.module/.moduleconfig> <OPTIONAL SWITCHES>\n"
-            "Providing multiple module/moduleconfig paths can be done with comma separation\n"
+            "Providing multiple module/moduleconfig paths can be done with using spaces\n"
             "\n"
             "Optional switches\n"
             "-o <DIR>   | Module output directory (OUT only)\n"
