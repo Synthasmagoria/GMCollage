@@ -1,3 +1,6 @@
+This is an outdated version of the software.
+The new version is here: https://github.com/Synthasmagoria/gmcollage-python
+
 Valid asset types in moduleconfig files are:
  - datafiles
  - sounds
